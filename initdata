@@ -1,0 +1,32 @@
+#!/bin/bash
+
+cd ./data;
+
+#if data are initialy compressed
+echo "unzipping data files..";
+for file in ./x*.gz; do
+	gunzip $file;
+done
+
+#rename basic txt files into json
+rename 's/$/.json/' x*;
+gzip x*.json;
+
+echo "Translating data into different reification formats...";
+cd ../translation;
+./translate_all.rb ../data;
+
+echo "unzipping files...";
+cd ../data;
+for file in ./*.nq.gz; do
+	gunzip $file;
+done
+
+echo "Deleting unwanted spaces...";
+for file in ./*.nq; do
+	echo "treating $file";
+	sed -i 's/\\u0020/_/g' $file;
+	echo "$file treated";
+done
+
+
